@@ -1,0 +1,47 @@
+
+<!DOCTYPE html>
+<html>
+<head><title>Painel Admin</title></head>
+<body>
+  <h2>Painel de Usuários</h2>
+  <table border="1">
+    <thead>
+      <tr><th>Nome</th><th>Usuário</th><th>Moedas</th><th>Ações</th></tr>
+    </thead>
+    <tbody id="tabelaUsuarios"></tbody>
+  </table>
+
+  <script>
+    async function carregar() {
+      const res = await fetch('http://localhost:3000/users');
+      const dados = await res.json();
+      const corpo = document.getElementById('tabelaUsuarios');
+      corpo.innerHTML = '';
+      dados.forEach(u => {
+        corpo.innerHTML += `<tr>
+          <td>${u.nome}</td>
+          <td>${u.usuario}</td>
+          <td><input type='number' value='${u.moedas}' onchange='atualizar("${u._id}", this.value)'></td>
+          <td><button onclick='excluir("${u._id}")'>Excluir</button></td>
+        </tr>`;
+      });
+    }
+
+    async function atualizar(id, moedas) {
+      await fetch('http://localhost:3000/users/' + id, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ moedas: parseInt(moedas) })
+      });
+      carregar();
+    }
+
+    async function excluir(id) {
+      await fetch('http://localhost:3000/users/' + id, { method: 'DELETE' });
+      carregar();
+    }
+
+    carregar();
+  </script>
+</body>
+</html>
